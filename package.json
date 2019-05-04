@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "react-dev": "webpack -d --watch",
-    "server-dev": "nodemon server/index.js"
+    "start": "nodemon server/index.js"
   },
   "author": "Beth Johnson",
   "license": "ISC",
@@ -19,11 +19,19 @@
   "dependencies": {
     "angular": "^1.6.3",
     "body-parser": "^1.17.2",
+    "bootstrap": "^4.3.1",
+    "connect-form": "^0.2.1",
+    "cors": "^2.8.5",
     "express": "^4.15.0",
+    "formidable": "^1.2.1",
     "jquery": "^3.1.1",
     "mongoose": "^4.8.6",
+    "multer": "^1.4.1",
     "mysql": "^2.13.0",
+    "nodemon": "^1.19.0",
+    "pg": "^7.10.0",
     "react": "^15.4.2",
+    "react-bootstrap": "^1.0.0-beta.8",
     "react-dom": "^15.4.2"
   }
 }
