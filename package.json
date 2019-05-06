@@ -18,20 +18,27 @@
   },
   "dependencies": {
     "angular": "^1.6.3",
+    "aws-sdk": "^2.449.0",
     "body-parser": "^1.17.2",
     "bootstrap": "^4.3.1",
     "connect-form": "^0.2.1",
     "cors": "^2.8.5",
+    "dotenv": "^8.0.0",
     "express": "^4.15.0",
+    "express-formidable": "^1.2.0",
     "formidable": "^1.2.1",
     "jquery": "^3.1.1",
     "mongoose": "^4.8.6",
     "multer": "^1.4.1",
+    "multer-imager": "^3.3.3",
+    "multer-s3": "^2.9.0",
+    "multer-sharp": "^0.5.2",
     "mysql": "^2.13.0",
     "nodemon": "^1.19.0",
     "pg": "^7.10.0",
     "react": "^15.4.2",
     "react-bootstrap": "^1.0.0-beta.8",
-    "react-dom": "^15.4.2"
+    "react-dom": "^15.4.2",
+    "react-exif-orientation-img": "^0.1.5"
   }
 }

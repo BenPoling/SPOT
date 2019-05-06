@@ -4,48 +4,79 @@ const cors = require("cors");
 const multer = require("multer");
 const formidable = require("formidable");
 const fs = require("fs");
-
+// const imager = require("multer-imager");
+const gcsSharp = require("multer-sharp");
+const aws = require("aws-sdk");
+const dotenv = require("dotenv");
 var pg = require("../postgres/postgres.js");
-
+dotenv.config();
+const PORT = process.env.PORT || 5000;
 var app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
-
 app.use(express.static(__dirname + "/../react-client/dist"));
 
-var storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    cb(null, "uploads");
+const storage = gcsSharp({
+  bucket: "spotphotos",
+  projectId: process.env.PROJECTID,
+  keyFilename: "MyFirstProject-2d0407bb0e31.json",
+  acl: "publicRead",
+  size: {
+    width: 400,
+    height: 400
   },
-  filename: function(req, file, cb) {
-    cb(null, file.fieldname + "-" + Date.now());
-  }
+  max: true
 });
 
 var upload = multer({ storage: storage });
 
-app.get("/items", function(req, res) {});
+app.get("/get", function(req, res) {
+  let quer = "SELECT * FROM allSpots ";
+  pg.query(quer)
+    .then(data => res.send(data.rows))
+    .catch(err => res.send(err));
+});
+app.get("/filter/", (req, res) => {
+  let quer = "SELECT * FROM allSpots";
+  let options = [];
+  let queryObj = req.query;
+  for (let key in queryObj) {
+    if (queryObj[key] === "") {
+      continue;
+    }
+    options.push([key, queryObj[key]]);
+  }
+  if (options.length === 1) {
+    quer += ` WHERE ${options[0][0]}='${options[0][1]}'`;
+  } else if (options.length === 2) {
+    quer += ` WHERE ${options[0][0]}='${options[0][1]}' AND ${options[1][0]}='${
+      options[1][1]
+    }'`;
+  }
+  pg.query(quer)
+    .then(filterResult => res.send(filterResult.rows))
+    .catch(err => res.send(err));
+});
 
 app.post("/upload", upload.single("photo"), (req, res) => {
-  const { address, description, city } = req.body;
-  const img = fs.readFileSync(req.file.path);
-  const photo = img.toString("base64");
+  const photo = req.file.path;
+  const { address, description, city, type } = req.body;
   const spotObj = {
     address,
     description,
     city,
     photo
   };
-  let quer = `INSERT INTO allSpots (spot) VALUES ('${JSON.stringify(
+  console.log(spotObj);
+  let quer = `INSERT INTO allSpots (type, city, spot) VALUES ('${type}', '${city}', '${JSON.stringify(
     spotObj
   )}')`;
   pg.query(quer)
-    .then(data => console.log(data))
-    .catch(err => console.log(err));
-  console.log(spotObj);
+    .then(data => res.send(200))
+    .catch(err => res.send(err));
 });
 
-app.listen(3000, function() {
-  console.log("listening on port 3000!");
+app.listen(PORT, function() {
+  console.log(`listening on port ${PORT}!`);
 });

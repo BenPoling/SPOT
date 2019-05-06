@@ -1,8 +1,98 @@
 .inputForm {
   display: flex;
   flex-direction: column;
+  margin-bottom: 70px;
+  width: 400px;
+  /* margin: auto; */
+  margin-bottom: 8px;
 }
 
-.formDIV {
+body {
+  background-color: aliceblue;
+}
+
+.formContainer {
   display: flex;
+  justify-content: center;
+}
+
+.leftSkate {
+  background-image: url("./left.png");
+  background-repeat: no-repeat;
+  /* position: absolute; */
+  width: 20em;
+  background-position: center;
+}
+
+.rightSkate {
+  background-image: url("./right.png");
+  background-repeat: no-repeat;
+  /* position: absolute; */
+  width: 20em;
+  background-position: center;
+}
+
+/* .formDIV {
+  display: flex;
+  flex-direction: column;
+} */
+.citySelectDiv {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.filterDiv {
+  display: flex;
+  justify-content: center;
+  margin-top: 5px;
+}
+
+h1 {
+  display: flex;
+  justify-content: center;
+  font-size: 40px;
+}
+
+.photoDiv {
+  height: 300px;
+}
+
+.photoContainer {
+  width: 400px;
+  margin: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.17);
+  text-align: center;
+}
+
+/* #app {
+  display: flex;
+  justify-content: center;
+} */
+.photoArrayContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.typePhotoSelectDiv {
+  display: flex;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.submitButton {
+  width: 100px;
+  align-self: center;
+}
+
+input {
+  outline: none;
+}
+
+textarea {
+  outline: none;
+}
+
+select {
+  outline: none;
 }
