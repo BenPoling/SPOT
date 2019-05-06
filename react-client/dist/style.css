@@ -55,6 +55,7 @@ h1 {
 
 .photoDiv {
   height: 300px;
+  width: 300px;
 }
 
 .photoContainer {
@@ -62,6 +63,11 @@ h1 {
   margin: 5px;
   border: 1px solid rgba(0, 0, 0, 0.17);
   text-align: center;
+}
+
+img {
+  height: 100%;
+  width: 100%;
 }
 
 /* #app {

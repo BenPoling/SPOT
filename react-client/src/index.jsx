@@ -2,6 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import Photo from "./components/Photo.jsx";
 
+window.desc = {};
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -18,6 +20,7 @@ class App extends React.Component {
     this.formChange = this.formChange.bind(this);
     this.formSubmit = this.formSubmit.bind(this);
     this.filterOnChange = this.filterOnChange.bind(this);
+    this.updateDesc = this.updateDesc.bind(this);
   }
 
   componentDidMount() {
@@ -57,20 +60,40 @@ class App extends React.Component {
     );
   }
 
+  updateDesc(e) {
+    console.log(window.desc[e.currentTarget.id].innerText);
+    const updateObj = {
+      id: e.currentTarget.id,
+      description: window.desc[e.currentTarget.id].innerText
+    };
+    fetch("/update", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+        // "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: JSON.stringify(updateObj)
+    });
+  }
+
   formSubmit(e) {
     e.preventDefault();
     const body = new FormData(this.formRef);
-    let options = {
-      method: "POST",
-      body
-    };
-    fetch("/upload", options).then(() => {
-      this.setState({
-        description: "",
-        address: "",
-        city: "Phoenix",
-        photo: "",
-        type: "HandRail"
+    getOrientation(body.get("photo"), or => {
+      const orientation = or;
+      body.append("orientation", orientation);
+      let options = {
+        method: "POST",
+        body
+      };
+      fetch("/upload", options).then(() => {
+        this.setState({
+          description: "",
+          address: "",
+          city: "Phoenix",
+          photo: "",
+          type: "HandRail"
+        });
       });
     });
   }
@@ -149,6 +172,8 @@ class App extends React.Component {
                   <option>HandiCap</option>
                   <option>Ledge</option>
                   <option>Skatepark</option>
+                  <option>Cruise Spot</option>
+                  <option>Creative</option>
                   <option>Other</option>
                 </select>
               </div>
@@ -158,6 +183,7 @@ class App extends React.Component {
                   type="file"
                   id="photo"
                   name="photo"
+                  accept="image/*"
                   value={photo}
                   onChange={this.formChange}
                   ref={ref => {
@@ -207,10 +233,48 @@ class App extends React.Component {
             <option>Goodyear</option>
           </select>
         </div>
-        <Photo photo={photos} />
+        <Photo photo={photos} updateDesc={this.updateDesc} />
       </div>
     );
   }
 }
 
 ReactDOM.render(<App />, document.getElementById("app"));
+
+function getOrientation(file, callback) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var view = new DataView(e.target.result);
+    if (view.getUint16(0, false) != 0xffd8) {
+      return callback(-2);
+    }
+    var length = view.byteLength,
+      offset = 2;
+    while (offset < length) {
+      if (view.getUint16(offset + 2, false) <= 8) return callback(-1);
+      var marker = view.getUint16(offset, false);
+      offset += 2;
+      if (marker == 0xffe1) {
+        if (view.getUint32((offset += 2), false) != 0x45786966) {
+          return callback(-1);
+        }
+
+        var little = view.getUint16((offset += 6), false) == 0x4949;
+        offset += view.getUint32(offset + 4, little);
+        var tags = view.getUint16(offset, little);
+        offset += 2;
+        for (var i = 0; i < tags; i++) {
+          if (view.getUint16(offset + i * 12, little) == 0x0112) {
+            return callback(view.getUint16(offset + i * 12 + 8, little));
+          }
+        }
+      } else if ((marker & 0xff00) != 0xff00) {
+        break;
+      } else {
+        offset += view.getUint16(offset, false);
+      }
+    }
+    return callback(-1);
+  };
+  reader.readAsArrayBuffer(file);
+}

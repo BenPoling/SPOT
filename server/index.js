@@ -12,7 +12,7 @@ var pg = require("../postgres/postgres.js");
 dotenv.config();
 const PORT = process.env.PORT || 5000;
 var app = express();
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 app.use(express.static(__dirname + "/../react-client/dist"));
@@ -29,7 +29,7 @@ const storage = gcsSharp({
   max: true
 });
 
-var upload = multer({ storage: storage });
+var upload = multer({ storage });
 
 app.get("/get", function(req, res) {
   let quer = "SELECT * FROM allSpots ";
@@ -61,20 +61,33 @@ app.get("/filter/", (req, res) => {
 
 app.post("/upload", upload.single("photo"), (req, res) => {
   const photo = req.file.path;
-  const { address, description, city, type } = req.body;
+  const { address, description, city, type, orientation } = req.body;
   const spotObj = {
     address,
     description,
     city,
+    orientation,
     photo
   };
-  console.log(spotObj);
   let quer = `INSERT INTO allSpots (type, city, spot) VALUES ('${type}', '${city}', '${JSON.stringify(
     spotObj
   )}')`;
   pg.query(quer)
     .then(data => res.send(200))
     .catch(err => res.send(err));
+});
+
+app.patch("/update", (req, res) => {
+  const { description, id } = req.body;
+  console.log(description, id);
+  pg.query(`SELECT spot FROM allSpots WHERE id=${id}`).then(data => {
+    let oldSpot = data.rows[0].spot;
+    console.log(oldSpot);
+    oldSpot.description = description;
+    pg.query(
+      `UPDATE allSpots SET spot='${JSON.stringify(oldSpot)}' WHERE id=${id}`
+    );
+  });
 });
 
 app.listen(PORT, function() {
