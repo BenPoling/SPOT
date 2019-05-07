@@ -26,11 +26,14 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    fetch("/get")
-      .then(data => data.json())
+    fetch("http://ec2-54-201-22-186.us-west-2.compute.amazonaws.com/get")
+      .then(data => {
+        console.log(data);
+        return data.json();
+      })
       .then(photos => {
         this.setState({
-          photos: photos
+          photos: photos.reverse()
         });
       });
   }
@@ -48,13 +51,16 @@ class App extends React.Component {
       },
       () => {
         const { cityFilter, typeFilter } = this.state;
-        fetch(`/filter/?city=${cityFilter}&type=${typeFilter}`, {
-          method: "GET"
-        })
+        fetch(
+          `http://ec2-54-201-22-186.us-west-2.compute.amazonaws.com/filter/?city=${cityFilter}&type=${typeFilter}`,
+          {
+            method: "GET"
+          }
+        )
           .then(filterData => filterData.json())
           .then(filterResult => {
             this.setState({
-              photos: filterResult
+              photos: filterResult.reverse()
             });
           });
       }
@@ -67,7 +73,7 @@ class App extends React.Component {
       id: e.currentTarget.id,
       description: window.desc[e.currentTarget.id].innerText
     };
-    fetch("/update", {
+    fetch("http://ec2-54-201-22-186.us-west-2.compute.amazonaws.com/update", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json"
@@ -87,9 +93,15 @@ class App extends React.Component {
       body.append("typeFilter", typeFilter);
       let options = {
         method: "POST",
+        headers: {
+          "Access-Control-Allow-Origin": "*"
+        },
         body
       };
-      fetch("/upload", options)
+      fetch(
+        "http://ec2-54-201-22-186.us-west-2.compute.amazonaws.com/upload",
+        options
+      )
         .then(resp => {
           this.setState({
             description: "",
@@ -98,11 +110,12 @@ class App extends React.Component {
             photo: "",
             type: "HandRail"
           });
+          console.log(resp);
           return resp.json();
         })
         .then(filteredPhotos =>
           this.setState({
-            photos: filteredPhotos
+            photos: filteredPhotos.reverse()
           })
         )
         .catch(err => console.log(err));
@@ -110,7 +123,7 @@ class App extends React.Component {
   }
 
   randomSpot() {
-    fetch("/random")
+    fetch("http://ec2-54-201-22-186.us-west-2.compute.amazonaws.com/random")
       .then(data => data.json())
       .then(randomSpot =>
         this.setState({

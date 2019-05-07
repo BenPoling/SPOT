@@ -5,20 +5,24 @@
   "main": "index.js",
   "scripts": {
     "react-dev": "webpack -d --watch",
-    "start": "nodemon server/index.js"
+    "start": "nodemon server/index.js",
+    "prod-build": "webpack --mode production"
   },
   "author": "Beth Johnson",
   "license": "ISC",
   "devDependencies": {
-    "babel-core": "^6.23.1",
-    "babel-loader": "^6.3.2",
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.5",
     "babel-preset-es2015": "^6.22.0",
-    "babel-preset-react": "^6.23.0",
-    "webpack": "^2.2.1"
+    "webpack": "^4.30.0"
   },
   "dependencies": {
     "angular": "^1.6.3",
     "aws-sdk": "^2.449.0",
+    "babel": "^6.23.0",
     "body-parser": "^1.17.2",
     "bootstrap": "^4.3.1",
     "connect-form": "^0.2.1",
@@ -41,6 +45,7 @@
     "react-bootstrap": "^1.0.0-beta.8",
     "react-dom": "^15.4.2",
     "react-exif-orientation-img": "^0.1.5",
-    "react-fix-image-orientation": "^0.1.4"
+    "react-fix-image-orientation": "^0.1.4",
+    "webpack-cli": "^3.3.2"
   }
 }

@@ -2,16 +2,14 @@ var express = require("express");
 var bodyParser = require("body-parser");
 const cors = require("cors");
 const multer = require("multer");
-const formidable = require("formidable");
-const fs = require("fs");
-// const imager = require("multer-imager");
 const gcsSharp = require("multer-sharp");
-const aws = require("aws-sdk");
 const dotenv = require("dotenv");
 var pg = require("../postgres/postgres.js");
 const filterFunc = require("./filterFunc.js");
+
 dotenv.config();
 const PORT = process.env.PORT || 5000;
+
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -33,7 +31,7 @@ const storage = gcsSharp({
 var upload = multer({ storage });
 
 app.get("/get", function(req, res) {
-  let quer = "SELECT * FROM allSpots ";
+  let quer = "SELECT * FROM allSpots";
   pg.query(quer)
     .then(data => res.send(data.rows))
     .catch(err => res.send(err));
@@ -57,7 +55,6 @@ app.post("/upload", upload.single("photo"), (req, res) => {
     typeFilter,
     cityFilter
   } = req.body;
-  console.log(typeFilter, cityFilter);
   const spotObj = {
     address,
     description,

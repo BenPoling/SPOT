@@ -3,7 +3,6 @@
   flex-direction: column;
   margin-bottom: 70px;
   width: 400px;
-  /* margin: auto; */
   margin-bottom: 8px;
 }
 
@@ -19,7 +18,6 @@ body {
 .leftSkate {
   background-image: url("./left.png");
   background-repeat: no-repeat;
-  /* position: absolute; */
   width: 20em;
   background-position: center;
   animation: moveInTop 1s ease-out;
@@ -28,16 +26,11 @@ body {
 .rightSkate {
   background-image: url("./right.png");
   background-repeat: no-repeat;
-  /* position: absolute; */
   width: 20em;
   background-position: center;
   animation: moveInTop 1s ease-out;
 }
 
-/* .formDIV {
-  display: flex;
-  flex-direction: column;
-} */
 .citySelectDiv {
   margin-top: 8px;
   margin-bottom: 8px;
@@ -53,6 +46,7 @@ h1 {
   display: flex;
   justify-content: center;
   font-size: 40px;
+  animation: fadeIn 1s ease-in;
 }
 
 .photoDiv {
@@ -73,10 +67,6 @@ img {
   width: 100%;
 }
 
-/* #app {
-  display: flex;
-  justify-content: center;
-} */
 .photoArrayContainer {
   display: flex;
   flex-wrap: wrap;
@@ -140,7 +130,7 @@ select {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-@media only screen and (max-width: 740px) {
+@media screen and (max-width: 740px) {
   .rightSkate {
     display: none;
   }
@@ -169,5 +159,23 @@ select {
   100% {
     opacity: 1;
     transform: translate(0);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
