@@ -3,11 +3,10 @@ import Img from "react-fix-image-orientation";
 
 const Photo = ({ photo, updateDesc }) => {
   if (photo !== null) {
-    photo = photo.reverse();
     const photoArr = photo.map(curr => {
-      let thing = "none";
+      let transformOption = "none";
       if (curr.spot.orientation === "6") {
-        thing = "rotate(90deg)";
+        transformOption = "rotate(90deg)";
       }
       return (
         <div id={curr.id} key={curr.id} className="photoContainer">
@@ -15,7 +14,7 @@ const Photo = ({ photo, updateDesc }) => {
             <Img
               src={curr.spot.photo}
               alt="skateSpot"
-              style={{ transform: `${thing}` }}
+              style={{ transform: `${transformOption}` }}
             />
           </div>
           <div className="descDiv">
@@ -26,10 +25,11 @@ const Photo = ({ photo, updateDesc }) => {
               ref={ref => {
                 window.desc[curr.id] = ref;
               }}
+              className="photoDescription"
             >
               {curr.spot.description}
             </p>
-            <button id={curr.id} onClick={updateDesc}>
+            <button id={curr.id} onClick={updateDesc} className="updateButton">
               Update
             </button>
           </div>

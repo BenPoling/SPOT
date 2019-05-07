@@ -22,6 +22,7 @@ body {
   /* position: absolute; */
   width: 20em;
   background-position: center;
+  animation: moveInTop 1s ease-out;
 }
 
 .rightSkate {
@@ -30,6 +31,7 @@ body {
   /* position: absolute; */
   width: 20em;
   background-position: center;
+  animation: moveInTop 1s ease-out;
 }
 
 /* .formDIV {
@@ -56,6 +58,7 @@ h1 {
 .photoDiv {
   height: 300px;
   width: 300px;
+  margin: auto;
 }
 
 .photoContainer {
@@ -91,6 +94,17 @@ img {
   align-self: center;
 }
 
+.randomButtonDiv {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.randomSpotButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
 input {
   outline: none;
 }
@@ -101,4 +115,59 @@ textarea {
 
 select {
   outline: none;
+}
+
+.photoDescription {
+  outline: none;
+}
+
+.photoDescription:hover {
+  background-color: white;
+}
+
+.updateButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.submitButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+#photo:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+@media only screen and (max-width: 740px) {
+  .rightSkate {
+    display: none;
+  }
+  .leftSkate {
+    height: 12em;
+    margin: auto;
+  }
+  .formContainer {
+    flex-direction: column;
+  }
+  .inputForm {
+    margin: auto;
+  }
+}
+
+@keyframes moveInTop {
+  0% {
+    opacity: 0;
+    transform: translatey(-100px);
+  }
+
+  80% {
+    transform: translatey(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(0);
+  }
 }

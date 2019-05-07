@@ -9,6 +9,7 @@ const gcsSharp = require("multer-sharp");
 const aws = require("aws-sdk");
 const dotenv = require("dotenv");
 var pg = require("../postgres/postgres.js");
+const filterFunc = require("./filterFunc.js");
 dotenv.config();
 const PORT = process.env.PORT || 5000;
 var app = express();
@@ -20,7 +21,7 @@ app.use(express.static(__dirname + "/../react-client/dist"));
 const storage = gcsSharp({
   bucket: "spotphotos",
   projectId: process.env.PROJECTID,
-  keyFilename: "MyFirstProject-2d0407bb0e31.json",
+  keyFilename: "dotted-lens-239619-de714bdcfb09.json",
   acl: "publicRead",
   size: {
     width: 400,
@@ -38,22 +39,8 @@ app.get("/get", function(req, res) {
     .catch(err => res.send(err));
 });
 app.get("/filter/", (req, res) => {
-  let quer = "SELECT * FROM allSpots";
-  let options = [];
   let queryObj = req.query;
-  for (let key in queryObj) {
-    if (queryObj[key] === "") {
-      continue;
-    }
-    options.push([key, queryObj[key]]);
-  }
-  if (options.length === 1) {
-    quer += ` WHERE ${options[0][0]}='${options[0][1]}'`;
-  } else if (options.length === 2) {
-    quer += ` WHERE ${options[0][0]}='${options[0][1]}' AND ${options[1][0]}='${
-      options[1][1]
-    }'`;
-  }
+  let quer = filterFunc(queryObj);
   pg.query(quer)
     .then(filterResult => res.send(filterResult.rows))
     .catch(err => res.send(err));
@@ -61,7 +48,16 @@ app.get("/filter/", (req, res) => {
 
 app.post("/upload", upload.single("photo"), (req, res) => {
   const photo = req.file.path;
-  const { address, description, city, type, orientation } = req.body;
+  const {
+    address,
+    description,
+    city,
+    type,
+    orientation,
+    typeFilter,
+    cityFilter
+  } = req.body;
+  console.log(typeFilter, cityFilter);
   const spotObj = {
     address,
     description,
@@ -73,21 +69,36 @@ app.post("/upload", upload.single("photo"), (req, res) => {
     spotObj
   )}')`;
   pg.query(quer)
-    .then(data => res.send(200))
+    .then(data => {
+      const queryObj = {
+        type: typeFilter,
+        city: cityFilter
+      };
+      let filteredQuery = filterFunc(queryObj);
+      pg.query(filteredQuery)
+        .then(filteredData => res.send(filteredData.rows))
+        .catch(err => res.send(err));
+    })
     .catch(err => res.send(err));
 });
 
 app.patch("/update", (req, res) => {
   const { description, id } = req.body;
-  console.log(description, id);
   pg.query(`SELECT spot FROM allSpots WHERE id=${id}`).then(data => {
     let oldSpot = data.rows[0].spot;
-    console.log(oldSpot);
     oldSpot.description = description;
     pg.query(
       `UPDATE allSpots SET spot='${JSON.stringify(oldSpot)}' WHERE id=${id}`
     );
   });
+});
+
+app.get("/random", (req, res) => {
+  pg.query("SELECT * FROM allSpots ORDER BY RANDOM() LIMIT 1;")
+    .then(randomRow => {
+      res.send(randomRow.rows);
+    })
+    .catch(err => res.send(err));
 });
 
 app.listen(PORT, function() {
