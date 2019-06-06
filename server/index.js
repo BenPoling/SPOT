@@ -1,16 +1,16 @@
-var express = require("express");
-var bodyParser = require("body-parser");
+const express = require("express");
+const bodyParser = require("body-parser");
 const cors = require("cors");
 const multer = require("multer");
 const gcsSharp = require("multer-sharp");
 const dotenv = require("dotenv");
-var pg = require("../postgres/postgres.js");
+const pg = require("../postgres/postgres.js");
 const filterFunc = require("./filterFunc.js");
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
 
-var app = express();
+const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
@@ -28,12 +28,15 @@ const storage = gcsSharp({
   max: true
 });
 
-var upload = multer({ storage });
+const upload = multer({ storage });
 
 app.get("/get", function(req, res) {
   let quer = "SELECT * FROM allSpots";
   pg.query(quer)
-    .then(data => res.send(data.rows))
+    .then(data => {
+      console.log(data.rows);
+      res.send(data.rows);
+    })
     .catch(err => res.send(err));
 });
 app.get("/filter/", (req, res) => {
@@ -72,8 +75,12 @@ app.post("/upload", upload.single("photo"), (req, res) => {
         city: cityFilter
       };
       let filteredQuery = filterFunc(queryObj);
+      console.log(filteredQuery);
       pg.query(filteredQuery)
-        .then(filteredData => res.send(filteredData.rows))
+        .then(filteredData => {
+          // console.log(filteredData);
+          res.send(filteredData.rows);
+        })
         .catch(err => res.send(err));
     })
     .catch(err => res.send(err));
