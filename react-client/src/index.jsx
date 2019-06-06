@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import Photo from "./components/Photo.jsx";
+import Form from "./components/PostForm.jsx";
 import getOrientation from "./utils/getOrientation.js";
 
 window.desc = {};
@@ -26,9 +27,17 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    fetch("http://ec2-54-201-22-186.us-west-2.compute.amazonaws.com/get")
+    let options = {
+      method: "GET",
+      headers: {
+        "Access-Control-Allow-Origin": "*"
+      }
+    };
+    fetch(
+      "http://ec2-54-191-206-34.us-west-2.compute.amazonaws.com/get",
+      options
+    )
       .then(data => {
-        console.log(data);
         return data.json();
       })
       .then(photos => {
@@ -52,7 +61,7 @@ class App extends React.Component {
       () => {
         const { cityFilter, typeFilter } = this.state;
         fetch(
-          `http://ec2-54-201-22-186.us-west-2.compute.amazonaws.com/filter/?city=${cityFilter}&type=${typeFilter}`,
+          `http://ec2-54-191-206-34.us-west-2.compute.amazonaws.com/filter/?city=${cityFilter}&type=${typeFilter}`,
           {
             method: "GET"
           }
@@ -68,12 +77,11 @@ class App extends React.Component {
   }
 
   updateDesc(e) {
-    console.log(window.desc[e.currentTarget.id].innerText);
     const updateObj = {
       id: e.currentTarget.id,
       description: window.desc[e.currentTarget.id].innerText
     };
-    fetch("http://ec2-54-201-22-186.us-west-2.compute.amazonaws.com/update", {
+    fetch("http://ec2-54-191-206-34.us-west-2.compute.amazonaws.com/update", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json"
@@ -85,7 +93,7 @@ class App extends React.Component {
   formSubmit(e) {
     e.preventDefault();
     const { typeFilter, cityFilter } = this.state;
-    const body = new FormData(this.formRef);
+    const body = new FormData(window.desc["formRef"]);
     getOrientation(body.get("photo"), or => {
       const orientation = or;
       body.append("orientation", orientation);
@@ -99,7 +107,7 @@ class App extends React.Component {
         body
       };
       fetch(
-        "http://ec2-54-201-22-186.us-west-2.compute.amazonaws.com/upload",
+        "http://ec2-54-191-206-34.us-west-2.compute.amazonaws.com/upload",
         options
       )
         .then(resp => {
@@ -110,20 +118,21 @@ class App extends React.Component {
             photo: "",
             type: "HandRail"
           });
-          console.log(resp);
+          // console.log(resp, "THIS IS THE RESPONSE");
           return resp.json();
         })
-        .then(filteredPhotos =>
+        .then(filteredPhotos => {
+          console.log(filteredPhotos, "PHOTOS ON POST");
           this.setState({
             photos: filteredPhotos.reverse()
-          })
-        )
-        .catch(err => console.log(err));
+          });
+        })
+        .catch(err => console.log(err, "this is the error!"));
     });
   }
 
   randomSpot() {
-    fetch("http://ec2-54-201-22-186.us-west-2.compute.amazonaws.com/random")
+    fetch("http://ec2-54-191-206-34.us-west-2.compute.amazonaws.com/random")
       .then(data => data.json())
       .then(randomSpot =>
         this.setState({
@@ -147,90 +156,15 @@ class App extends React.Component {
     return (
       <div className="mainDiv" id="resetForm">
         <h1>SPOT!</h1>
-        <div className="formContainer">
-          <div className="leftSkate" />
-          <form
-            className="inputForm"
-            onSubmit={this.formSubmit}
-            ref={ref => {
-              this.formRef = ref;
-            }}
-          >
-            Address:
-            <input
-              type="text"
-              name="address"
-              id="address"
-              value={address}
-              onChange={this.formChange}
-            />
-            <div className="citySelectDiv">
-              City:
-              <select
-                name="city"
-                id="city"
-                onChange={this.formChange}
-                value={city}
-              >
-                <option>Phoenix</option>
-                <option>Tempe</option>
-                <option>Mesa</option>
-                <option>Scottsdale</option>
-                <option>Gilbert</option>
-                <option>Chandler</option>
-                <option>Queen Creek</option>
-                <option>Apache Junction</option>
-                <option>Glendale</option>
-                <option>Peoria</option>
-                <option>Surprise</option>
-                <option>Goodyear</option>
-              </select>
-            </div>
-            Description:
-            <textarea
-              type="text"
-              name="description"
-              id="description"
-              value={description}
-              onChange={this.formChange}
-            />
-            <div className="typePhotoSelectDiv">
-              <div className="typeSelectDiv">
-                Type:
-                <select
-                  name="type"
-                  id="type"
-                  onChange={this.formChange}
-                  value={type}
-                >
-                  <option>HandRail</option>
-                  <option>HandiCap</option>
-                  <option>Ledge</option>
-                  <option>Skatepark</option>
-                  <option>Cruise Spot</option>
-                  <option>Creative</option>
-                  <option>Other</option>
-                </select>
-              </div>
-              <div className="photoFileDiv">
-                Photo:
-                <input
-                  type="file"
-                  id="photo"
-                  name="photo"
-                  accept="image/*"
-                  value={photo}
-                  onChange={this.formChange}
-                  ref={ref => {
-                    this.uploadInput = ref;
-                  }}
-                />
-              </div>
-            </div>
-            <input type="submit" value="Post!" className="submitButton" />
-          </form>
-          <div className="rightSkate" />
-        </div>
+        <Form
+          submit={this.formSubmit}
+          address={address}
+          formChange={this.formChange}
+          city={city}
+          description={description}
+          type={type}
+          photo={photo}
+        />
         <div className="filterDiv">
           Filter By: Type:
           <select
