@@ -2,7 +2,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import Photo from "./components/Photo.jsx";
 import Form from "./components/PostForm.jsx";
-import getOrientation from "./utils/getOrientation.js";
 
 window.desc = {};
 
@@ -10,23 +9,37 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      description: "",
-      address: "",
-      city: "Phoenix",
-      photo: "",
       photos: null,
-      type: "HandRail",
       typeFilter: "",
-      cityFilter: ""
+      cityFilter: "",
+      view: "photos"
     };
-    this.formChange = this.formChange.bind(this);
-    this.formSubmit = this.formSubmit.bind(this);
     this.filterOnChange = this.filterOnChange.bind(this);
     this.updateDesc = this.updateDesc.bind(this);
     this.randomSpot = this.randomSpot.bind(this);
+    this.postViewChange = this.postViewChange.bind(this);
+    this.getAll = this.getAll.bind(this);
+  }
+
+  postViewChange() {
+    const { view } = this.state;
+    if (view === "photos") {
+      this.setState({
+        view: "post"
+      });
+    } else {
+      this.setState({
+        view: "photos"
+      });
+      this.getAll();
+    }
   }
 
   componentDidMount() {
+    this.getAll();
+  }
+
+  getAll() {
     let options = {
       method: "GET",
       headers: {
@@ -45,12 +58,6 @@ class App extends React.Component {
           photos: photos.reverse()
         });
       });
-  }
-
-  formChange(e) {
-    this.setState({
-      [e.currentTarget.id]: e.currentTarget.value
-    });
   }
 
   filterOnChange(e) {
@@ -90,47 +97,6 @@ class App extends React.Component {
     });
   }
 
-  formSubmit(e) {
-    e.preventDefault();
-    const { typeFilter, cityFilter } = this.state;
-    const body = new FormData(window.desc["formRef"]);
-    getOrientation(body.get("photo"), or => {
-      const orientation = or;
-      body.append("orientation", orientation);
-      body.append("cityFilter", cityFilter);
-      body.append("typeFilter", typeFilter);
-      let options = {
-        method: "POST",
-        headers: {
-          "Access-Control-Allow-Origin": "*"
-        },
-        body
-      };
-      fetch(
-        "http://ec2-54-191-206-34.us-west-2.compute.amazonaws.com/upload",
-        options
-      )
-        .then(resp => {
-          this.setState({
-            description: "",
-            address: "",
-            city: "Phoenix",
-            photo: "",
-            type: "HandRail"
-          });
-          // console.log(resp, "THIS IS THE RESPONSE");
-          return resp.json();
-        })
-        .then(filteredPhotos => {
-          console.log(filteredPhotos, "PHOTOS ON POST");
-          this.setState({
-            photos: filteredPhotos.reverse()
-          });
-        })
-        .catch(err => console.log(err, "this is the error!"));
-    });
-  }
-
   randomSpot() {
     fetch("http://ec2-54-191-206-34.us-west-2.compute.amazonaws.com/random")
       .then(data => data.json())
@@ -143,73 +109,66 @@ class App extends React.Component {
   }
 
   render() {
-    const {
-      description,
-      address,
-      city,
-      photo,
-      type,
-      photos,
-      typeFilter,
-      cityFilter
-    } = this.state;
-    return (
-      <div className="mainDiv" id="resetForm">
-        <h1>SPOT!</h1>
-        <Form
-          submit={this.formSubmit}
-          address={address}
-          formChange={this.formChange}
-          city={city}
-          description={description}
-          type={type}
-          photo={photo}
-        />
-        <div className="filterDiv">
-          Filter By: Type:
-          <select
-            name="typeFilter"
-            id="typeFilter"
-            onChange={this.filterOnChange}
-            value={typeFilter}
-          >
-            <option />
-            <option>HandRail</option>
-            <option>HandiCap</option>
-            <option>Ledge</option>
-            <option>Skatepark</option>
-            <option>Other</option>
-          </select>
-          City:
-          <select
-            name="cityFilter"
-            id="cityFilter"
-            onChange={this.filterOnChange}
-            value={cityFilter}
-          >
-            <option />
-            <option>Phoenix</option>
-            <option>Tempe</option>
-            <option>Mesa</option>
-            <option>Scottsdale</option>
-            <option>Gilbert</option>
-            <option>Chandler</option>
-            <option>Queen Creek</option>
-            <option>Apache Junction</option>
-            <option>Glendale</option>
-            <option>Peoria</option>
-            <option>Surprise</option>
-            <option>Goodyear</option>
-          </select>
+    const { photos, typeFilter, cityFilter, view } = this.state;
+    if (view === "photos") {
+      return (
+        <div className="mainDiv" id="resetForm">
+          <h1>SPOT!</h1>
+          <div>
+            <div className="randomButtonDiv">
+              <button onClick={this.postViewChange}>Post A Spot</button>
+              <button onClick={this.randomSpot} className="randomSpotButton">
+                GET RANDOM SPOT
+              </button>
+            </div>
+            <div className="filterDiv">
+              Type:
+              <select
+                name="typeFilter"
+                id="typeFilter"
+                onChange={this.filterOnChange}
+                value={typeFilter}
+              >
+                <option />
+                <option>HandRail</option>
+                <option>HandiCap</option>
+                <option>Ledge</option>
+                <option>Skatepark</option>
+                <option>Other</option>
+              </select>
+              City:
+              <select
+                name="cityFilter"
+                id="cityFilter"
+                onChange={this.filterOnChange}
+                value={cityFilter}
+              >
+                <option />
+                <option>Phoenix</option>
+                <option>Tempe</option>
+                <option>Mesa</option>
+                <option>Scottsdale</option>
+                <option>Gilbert</option>
+                <option>Chandler</option>
+                <option>Queen Creek</option>
+                <option>Apache Junction</option>
+                <option>Glendale</option>
+                <option>Peoria</option>
+                <option>Surprise</option>
+                <option>Goodyear</option>
+              </select>
+            </div>
+          </div>
+          <Photo photo={photos} updateDesc={this.updateDesc} />
         </div>
-        <div className="randomButtonDiv">
-          <button onClick={this.randomSpot} className="randomSpotButton">
-            GET RANDOM SPOT
-          </button>
+      );
+    } else {
+      return (
+        <div>
+          <Form view={this.postViewChange} />
         </div>
-        <Photo photo={photos} updateDesc={this.updateDesc} />
-      </div>
-    );
+      );
+    }
   }
 }
 
