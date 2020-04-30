@@ -33,7 +33,7 @@
     "express-formidable": "^1.2.0",
     "fix-orientation": "^1.0.0",
     "formidable": "^1.2.1",
-    "jquery": "^3.1.1",
+    "jquery": "^3.5.0",
     "mongoose": "^4.8.6",
     "multer": "^1.4.1",
     "multer-imager": "^3.3.3",
