@@ -34,7 +34,7 @@
     "fix-orientation": "^1.0.0",
     "formidable": "^1.2.1",
     "jquery": "^3.1.1",
-    "mongoose": "^4.8.6",
+    "mongoose": "^4.13.21",
     "multer": "^1.4.1",
     "multer-imager": "^3.3.3",
     "multer-s3": "^2.9.0",
