@@ -29,7 +29,7 @@
     "connect-form": "^0.2.1",
     "cors": "^2.8.5",
     "dotenv": "^8.0.0",
-    "express": "^4.15.0",
+    "express": "^4.17.3",
     "express-formidable": "^1.2.0",
     "fix-orientation": "^1.0.0",
     "formidable": "^1.2.1",
